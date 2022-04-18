@@ -429,7 +429,7 @@ def check_font(font=FONT):
     font = Path(font)
     if not font.exists() and not (CONFIG_DIR / font.name).exists():
         url = "https://ultralytics.com/assets/" + font.name
-        LOGGER.info(f'Downloading {url} to {CONFIG_DIR / font.name}...')
+        # LOGGER.info(f'Downloading {url} to {CONFIG_DIR / font.name}...')
         torch.hub.download_url_to_file(url, str(font), progress=False)
 
 
