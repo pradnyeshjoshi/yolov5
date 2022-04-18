@@ -409,9 +409,10 @@ def check_file(file, suffix=''):
         url = str(Path(file)).replace(':/', '://')  # Pathlib turns :// -> :/
         file = Path(urllib.parse.unquote(file).split('?')[0]).name  # '%2F' to '/', split https://url.com/file.txt?auth
         if Path(file).is_file():
-            LOGGER.info(f'Found {url} locally at {file}')  # file already exists
+            # LOGGER.info(f'Found {url} locally at {file}')  # file already exists
+            pass
         else:
-            LOGGER.info(f'Downloading {url} to {file}...')
+            # LOGGER.info(f'Downloading {url} to {file}...')
             torch.hub.download_url_to_file(url, file)
             assert Path(file).exists() and Path(file).stat().st_size > 0, f'File download failed: {url}'  # check
         return file
@@ -471,7 +472,7 @@ def check_dataset(data, autodownload=True):
                 root = path.parent if 'path' in data else '..'  # unzip directory i.e. '../'
                 if s.startswith('http') and s.endswith('.zip'):  # URL
                     f = Path(s).name  # filename
-                    LOGGER.info(f'Downloading {s} to {f}...')
+                    # LOGGER.info(f'Downloading {s} to {f}...')
                     torch.hub.download_url_to_file(s, f)
                     Path(root).mkdir(parents=True, exist_ok=True)  # create root
                     ZipFile(f).extractall(path=root)  # unzip
@@ -507,7 +508,7 @@ def download(url, dir='.', unzip=True, delete=True, curl=False, threads=1, retry
         if Path(url).is_file():  # exists in current path
             Path(url).rename(f)  # move to dir
         elif not f.exists():
-            LOGGER.info(f'Downloading {url} to {f}...')
+            # LOGGER.info(f'Downloading {url} to {f}...')
             for i in range(retry + 1):
                 if curl:
                     s = 'sS' if threads > 1 else ''  # silent
