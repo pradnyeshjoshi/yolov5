@@ -91,8 +91,8 @@ def set_logging(name=None, verbose=VERBOSE):
     log.addHandler(handler)
 
 
-set_logging()  # run before defining LOGGER
-LOGGER = logging.getLogger("yolov5")  # define globally (used in train.py, val.py, detect.py, etc.)
+# set_logging()  # run before defining LOGGER
+# LOGGER = logging.getLogger("yolov5")  # define globally (used in train.py, val.py, detect.py, etc.)
 
 
 def user_config_dir(dir='Ultralytics', env_var='YOLOV5_CONFIG_DIR'):
@@ -179,7 +179,7 @@ def print_args(args: Optional[dict] = None, show_file=True, show_fcn=False):
         args, _, _, frm = inspect.getargvalues(x)
         args = {k: v for k, v in frm.items() if k in args}
     s = (f'{Path(file).stem}: ' if show_file else '') + (f'{fcn}: ' if show_fcn else '')
-    LOGGER.info(colorstr(s) + ', '.join(f'{k}={v}' for k, v in args.items()))
+    # LOGGER.info(colorstr(s) + ', '.join(f'{k}={v}' for k, v in args.items()))
 
 
 def init_seeds(seed=0):
@@ -314,8 +314,7 @@ def check_version(current='0.0.0', minimum='0.0.0', name='version ', pinned=Fals
     s = f'{name}{minimum} required by YOLOv5, but {name}{current} is currently installed'  # string
     if hard:
         assert result, s  # assert min requirements met
-    if verbose and not result:
-        LOGGER.warning(s)
+
     return result
 
 
@@ -339,21 +338,22 @@ def check_requirements(requirements=ROOT / 'requirements.txt', exclude=(), insta
         except Exception:  # DistributionNotFound or VersionConflict if requirements not met
             s = f"{prefix} {r} not found and is required by YOLOv5"
             if install:
-                LOGGER.info(f"{s}, attempting auto-update...")
                 try:
                     assert check_online(), f"'pip install {r}' skipped (offline)"
-                    LOGGER.info(check_output(f"pip install '{r}'", shell=True).decode())
+                    # LOGGER.info(check_output(f"pip install '{r}'", shell=True).decode())/
                     n += 1
                 except Exception as e:
-                    LOGGER.warning(f'{prefix} {e}')
+                    # LOGGER.warning(f'{prefix} {e}')
+                    pass
             else:
-                LOGGER.info(f'{s}. Please install and rerun your command.')
+                pass
+                # LOGGER.info(f'{s}. Please install and rerun your command.')
 
     if n:  # if packages updated
         source = file.resolve() if 'file' in locals() else requirements
-        s = f"{prefix} {n} package{'s' * (n > 1)} updated per {source}\n" \
+        s = f"{prefix} {n} package{'s' * (n > 1)} updated per {source}\n" \``
             f"{prefix} ⚠️ {colorstr('bold', 'Restart runtime or rerun command for updates to take effect')}\n"
-        LOGGER.info(emojis(s))
+        # LOGGER.info(emojis(s))
 
 
 def check_img_size(imgsz, s=32, floor=0):
