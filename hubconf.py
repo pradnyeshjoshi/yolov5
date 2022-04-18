@@ -38,18 +38,18 @@ def _create(name, pretrained=True, channels=3, classes=80, autoshape=True, verbo
     name = Path(name)
     path = name.with_suffix('.pt') if name.suffix == '' else name  # checkpoint path
     try:
-        print("select_device")
+        # print("select_device")
         device = select_device(('0' if torch.cuda.is_available() else 'cpu') if device is None else device)
 
         if pretrained and channels == 3 and classes == 80:
-            print("DetectMultiBackend")
+            # print("DetectMultiBackend")
             model = DetectMultiBackend(path, device=device)  # download/load FP32 model
             # model = models.experimental.attempt_load(path, map_location=device)  # download/load FP32 model
         else:
             cfg = list((Path(__file__).parent / 'models').rglob(f'{path.stem}.yaml'))[0]  # model.yaml path
             model = Model(cfg, channels, classes)  # create model
             if pretrained:
-                print("load pretrained model")
+                # print("load pretrained model")
                 ckpt = torch.load(attempt_download(path), map_location=device)  # load
                 csd = ckpt['model'].float().state_dict()  # checkpoint state_dict as FP32
                 csd = intersect_dicts(csd, model.state_dict(), exclude=['anchors'])  # intersect
