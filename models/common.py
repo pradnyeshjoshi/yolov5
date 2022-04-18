@@ -22,7 +22,7 @@ from PIL import Image
 from torch.cuda import amp
 
 from utils.datasets import exif_transpose, letterbox
-from utils.general import (LOGGER, check_requirements, check_suffix, check_version, colorstr, increment_path,
+from utils.general import (check_requirements, check_suffix, check_version, colorstr, increment_path,
                            make_divisible, non_max_suppression, scale_coords, xywh2xyxy, xyxy2xywh)
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import copy_attr, time_sync
@@ -310,7 +310,7 @@ class DetectMultiBackend(nn.Module):
             model.half() if fp16 else model.float()
             self.model = model  # explicitly assign for to(), cpu(), cuda(), half()
         elif jit:  # TorchScript
-            LOGGER.info(f'Loading {w} for TorchScript inference...')
+            # LOGGER.info(f'Loading {w} for TorchScript inference...')
             extra_files = {'config.txt': ''}  # model metadata
             model = torch.jit.load(w, _extra_files=extra_files)
             model.half() if fp16 else model.float()
@@ -318,11 +318,11 @@ class DetectMultiBackend(nn.Module):
                 d = json.loads(extra_files['config.txt'])  # extra_files dict
                 stride, names = int(d['stride']), d['names']
         elif dnn:  # ONNX OpenCV DNN
-            LOGGER.info(f'Loading {w} for ONNX OpenCV DNN inference...')
+            # LOGGER.info(f'Loading {w} for ONNX OpenCV DNN inference...')
             check_requirements(('opencv-python>=4.5.4',))
             net = cv2.dnn.readNetFromONNX(w)
         elif onnx:  # ONNX Runtime
-            LOGGER.info(f'Loading {w} for ONNX Runtime inference...')
+            # LOGGER.info(f'Loading {w} for ONNX Runtime inference...')
             cuda = torch.cuda.is_available()
             check_requirements(('onnx', 'onnxruntime-gpu' if cuda else 'onnxruntime'))
             import onnxruntime
@@ -332,7 +332,7 @@ class DetectMultiBackend(nn.Module):
             if 'stride' in meta:
                 stride, names = int(meta['stride']), eval(meta['names'])
         elif xml:  # OpenVINO
-            LOGGER.info(f'Loading {w} for OpenVINO inference...')
+            # LOGGER.info(f'Loading {w} for OpenVINO inference...')
             check_requirements(('openvino-dev',))  # requires openvino-dev: https://pypi.org/project/openvino-dev/
             import openvino.inference_engine as ie
             core = ie.IECore()
@@ -341,7 +341,7 @@ class DetectMultiBackend(nn.Module):
             network = core.read_network(model=w, weights=Path(w).with_suffix('.bin'))  # *.xml, *.bin paths
             executable_network = core.load_network(network, device_name='CPU', num_requests=1)
         elif engine:  # TensorRT
-            LOGGER.info(f'Loading {w} for TensorRT inference...')
+            # LOGGER.info(f'Loading {w} for TensorRT inference...')
             import tensorrt as trt  # https://developer.nvidia.com/nvidia-tensorrt-download
             check_version(trt.__version__, '7.0.0', hard=True)  # require tensorrt>=7.0.0
             Binding = namedtuple('Binding', ('name', 'dtype', 'shape', 'data', 'ptr'))
@@ -362,17 +362,17 @@ class DetectMultiBackend(nn.Module):
             context = model.create_execution_context()
             batch_size = bindings['images'].shape[0]
         elif coreml:  # CoreML
-            LOGGER.info(f'Loading {w} for CoreML inference...')
+            # LOGGER.info(f'Loading {w} for CoreML inference...')
             import coremltools as ct
             model = ct.models.MLModel(w)
         else:  # TensorFlow (SavedModel, GraphDef, Lite, Edge TPU)
             if saved_model:  # SavedModel
-                LOGGER.info(f'Loading {w} for TensorFlow SavedModel inference...')
+                # LOGGER.info(f'Loading {w} for TensorFlow SavedModel inference...')
                 import tensorflow as tf
                 keras = False  # assume TF1 saved_model
                 model = tf.keras.models.load_model(w) if keras else tf.saved_model.load(w)
             elif pb:  # GraphDef https://www.tensorflow.org/guide/migrate#a_graphpb_or_graphpbtxt
-                LOGGER.info(f'Loading {w} for TensorFlow GraphDef inference...')
+                # LOGGER.info(f'Loading {w} for TensorFlow GraphDef inference...')
                 import tensorflow as tf
 
                 def wrap_frozen_graph(gd, inputs, outputs):
@@ -391,14 +391,14 @@ class DetectMultiBackend(nn.Module):
                     import tensorflow as tf
                     Interpreter, load_delegate = tf.lite.Interpreter, tf.lite.experimental.load_delegate,
                 if edgetpu:  # Edge TPU https://coral.ai/software/#edgetpu-runtime
-                    LOGGER.info(f'Loading {w} for TensorFlow Lite Edge TPU inference...')
+                    # LOGGER.info(f'Loading {w} for TensorFlow Lite Edge TPU inference...')
                     delegate = {
                         'Linux': 'libedgetpu.so.1',
                         'Darwin': 'libedgetpu.1.dylib',
                         'Windows': 'edgetpu.dll'}[platform.system()]
                     interpreter = Interpreter(model_path=w, experimental_delegates=[load_delegate(delegate)])
                 else:  # Lite
-                    LOGGER.info(f'Loading {w} for TensorFlow Lite inference...')
+                    # LOGGER.info(f'Loading {w} for TensorFlow Lite inference...')
                     interpreter = Interpreter(model_path=w)  # load TFLite model
                 interpreter.allocate_tensors()  # allocate
                 input_details = interpreter.get_input_details()  # inputs
@@ -502,7 +502,7 @@ class AutoShape(nn.Module):
 
     def __init__(self, model):
         super().__init__()
-        LOGGER.info('Adding AutoShape... ')
+        # LOGGER.info('Adding AutoShape... ')
         copy_attr(self, model, include=('yaml', 'nc', 'hyp', 'names', 'stride', 'abc'), exclude=())  # copy attributes
         self.dmb = isinstance(model, DetectMultiBackend)  # DetectMultiBackend() instance
         self.pt = not self.dmb or model.pt  # PyTorch model
@@ -628,26 +628,26 @@ class Detections:
                 s += '(no detections)'
 
             im = Image.fromarray(im.astype(np.uint8)) if isinstance(im, np.ndarray) else im  # from np
-            if pprint:
-                LOGGER.info(s.rstrip(', '))
+            # if pprint:
+                # LOGGER.info(s.rstrip(', '))
             if show:
                 im.show(self.files[i])  # show
             if save:
                 f = self.files[i]
                 im.save(save_dir / f)  # save
-                if i == self.n - 1:
-                    LOGGER.info(f"Saved {self.n} image{'s' * (self.n > 1)} to {colorstr('bold', save_dir)}")
+                # if i == self.n - 1:
+                    # LOGGER.info(f"Saved {self.n} image{'s' * (self.n > 1)} to {colorstr('bold', save_dir)}")
             if render:
                 self.imgs[i] = np.asarray(im)
         if crop:
-            if save:
-                LOGGER.info(f'Saved results to {save_dir}\n')
+            # if save:
+            #     LOGGER.info(f'Saved results to {save_dir}\n')
             return crops
 
     def print(self):
         self.display(pprint=True)  # print results
-        LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {tuple(self.s)}' %
-                    self.t)
+        # LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {tuple(self.s)}' %
+        #             self.t)
 
     def show(self, labels=True):
         self.display(show=True, labels=labels)  # show results

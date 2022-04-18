@@ -18,7 +18,7 @@ import torch.distributed as dist
 import torch.nn as nn
 import torch.nn.functional as F
 
-from utils.general import LOGGER, file_update_date, git_describe
+from utils.general import file_update_date, git_describe
 
 try:
     import thop  # for FLOPs computation
@@ -76,7 +76,7 @@ def select_device(device='', batch_size=0, newline=True):
 
     if not newline:
         s = s.rstrip()
-    LOGGER.info(s.encode().decode('ascii', 'ignore') if platform.system() == 'Windows' else s)  # emoji-safe
+    # LOGGER.info(s.encode().decode('ascii', 'ignore') if platform.system() == 'Windows' else s)  # emoji-safe
     return torch.device('cuda:0' if cuda else 'cpu')
 
 
@@ -231,7 +231,7 @@ def model_info(model, verbose=False, img_size=640):
         fs = ''
 
     name = Path(model.yaml_file).stem.replace('yolov5', 'YOLOv5') if hasattr(model, 'yaml_file') else 'Model'
-    LOGGER.info(f"{name} summary: {len(list(model.modules()))} layers, {n_p} parameters, {n_g} gradients{fs}")
+    # LOGGER.info(f"{name} summary: {len(list(model.modules()))} layers, {n_p} parameters, {n_g} gradients{fs}")
 
 
 def scale_img(img, ratio=1.0, same_shape=False, gs=32):  # img(16,3,256,416)
@@ -271,11 +271,11 @@ class EarlyStopping:
         delta = epoch - self.best_epoch  # epochs without improvement
         self.possible_stop = delta >= (self.patience - 1)  # possible stop may occur next epoch
         stop = delta >= self.patience  # stop training if patience exceeded
-        if stop:
-            LOGGER.info(f'Stopping training early as no improvement observed in last {self.patience} epochs. '
-                        f'Best results observed at epoch {self.best_epoch}, best model saved as best.pt.\n'
-                        f'To update EarlyStopping(patience={self.patience}) pass a new patience value, '
-                        f'i.e. `python train.py --patience 300` or use `--patience 0` to disable EarlyStopping.')
+        # if stop:
+        #     LOGGER.info(f'Stopping training early as no improvement observed in last {self.patience} epochs. '
+        #                 f'Best results observed at epoch {self.best_epoch}, best model saved as best.pt.\n'
+        #                 f'To update EarlyStopping(patience={self.patience}) pass a new patience value, '
+        #                 f'i.e. `python train.py --patience 300` or use `--patience 0` to disable EarlyStopping.')
         return stop
 
 
