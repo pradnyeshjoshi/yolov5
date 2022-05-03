@@ -41,7 +41,7 @@ print(os.getenv('LOCAL_RANK', -1))
 print(type(os.getenv('LOCAL_RANK', -1)))
 print("PRINTED LOCAL_RANK")
 # LOCAL_RANK = int(os.getenv('LOCAL_RANK', -1))  # https://pytorch.org/docs/stable/elastic/run.html
-LOCAL_RANK = int(str(os.getenv('LOCAL_RANK', -1)))  # https://pytorch.org/docs/stable/elastic/run.html
+LOCAL_RANK = -1
 
 # Get orientation exif tag
 for orientation in ExifTags.TAGS.keys():
