@@ -37,7 +37,9 @@ IMG_FORMATS = 'bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp'  
 VID_FORMATS = 'asf', 'avi', 'gif', 'm4v', 'mkv', 'mov', 'mp4', 'mpeg', 'mpg', 'ts', 'wmv'  # include video suffixes
 BAR_FORMAT = '{l_bar}{bar:10}{r_bar}{bar:-10b}'  # tqdm bar format
 print("PRINTING LOCAL_RANK")
-print(os.getenv('LOCAL_RANK', -1) is None)
+print(os.getenv('LOCAL_RANK', -1))
+print(type(os.getenv('LOCAL_RANK', -1)))
+print("PRINTED LOCAL_RANK")
 LOCAL_RANK = int(os.getenv('LOCAL_RANK', -1))  # https://pytorch.org/docs/stable/elastic/run.html
 # LOCAL_RANK = -1
 
